@@ -1,0 +1,27 @@
+{
+  "info": {
+    "name": "PulseNotify API",
+    "description": "Starter collection. Set base_url and access_token variables before running protected requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://127.0.0.1:8000"},
+    {"key": "access_token", "value": ""},
+    {"key": "alert_id", "value": "1"}
+  ],
+  "item": [
+    {"name": "01 Register user", "request": {"method": "POST", "header": [{"key":"Content-Type","value":"application/json"}], "body":{"mode":"raw","raw":"{\"username\":\"alice\",\"password\":\"securepass123\",\"email\":\"alice@example.com\"}","options":{"raw":{"language":"json"}}}, "url":"{{base_url}}/api/auth/register/"}},
+    {"name": "02 Register duplicate username (expect 400)", "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"username\":\"alice\",\"password\":\"securepass123\",\"email\":\"alice2@example.com\"}","options":{"raw":{"language":"json"}}},"url":"{{base_url}}/api/auth/register/"}},
+    {"name": "03 Login valid user", "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"username\":\"alice\",\"password\":\"securepass123\"}","options":{"raw":{"language":"json"}}},"url":"{{base_url}}/api/auth/login/"}},
+    {"name": "04 Login invalid credentials (expect 401)", "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"username\":\"alice\",\"password\":\"wrong-password\"}","options":{"raw":{"language":"json"}}},"url":"{{base_url}}/api/auth/login/"}},
+    {"name": "05 Create alert (JWT)", "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{access_token}}"}],"body":{"mode":"raw","raw":"{\"origin\":\"DEL\",\"destination\":\"BOM\",\"threshold_price\":\"4500.00\"}","options":{"raw":{"language":"json"}}},"url":"{{base_url}}/api/alerts/"}},
+    {"name": "06 List my alerts (JWT)", "request": {"method":"GET","header":[{"key":"Authorization","value":"Bearer {{access_token}}"}],"url":"{{base_url}}/api/alerts/"}},
+    {"name": "07 Deactivate own alert (JWT)", "request": {"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{access_token}}"}],"url":"{{base_url}}/api/alerts/{{alert_id}}/"}},
+    {"name": "08 Mock price DEL-BOM", "request": {"method":"GET","url":"{{base_url}}/api/flights/price/?route=DEL-BOM"}},
+    {"name": "09 Mock price unknown route (expect 404)", "request": {"method":"GET","url":"{{base_url}}/api/flights/price/?route=XXX-YYY"}},
+    {"name": "10 Admin summary as regular user (expect 403)", "request": {"method":"GET","header":[{"key":"Authorization","value":"Bearer {{access_token}}"}],"url":"{{base_url}}/api/admin/summary/"}},
+    {"name": "11 List alerts without token (expect 401)", "request": {"method":"GET","url":"{{base_url}}/api/alerts/"}},
+    {"name": "12 Create alert without token (expect 401)", "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"origin\":\"BLR\",\"destination\":\"HYD\",\"threshold_price\":\"2500.00\"}","options":{"raw":{"language":"json"}}},"url":"{{base_url}}/api/alerts/"}},
+    {"name": "13 Deactivate another user's alert (expect 404)", "request": {"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{access_token}}"}],"url":"{{base_url}}/api/alerts/999999/"}}
+  ]
+}
